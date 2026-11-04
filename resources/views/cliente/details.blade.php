@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Detalles del Cliente</title>
 </head>
 <body>
-    
+    <h1>Detalles del Cliente</h1>
 </body>
 </html>
