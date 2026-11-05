@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('oficinas', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo_oficina',10)->unique();
-            $table->string('ciudad',50);
-            $table->string('calle',100);
+            $table->string('codigo_oficina', 10)->unique();
+            $table->string('ciudad', 50);
+            $table->string('calle', 100);
             $table->integer('numero');
-            $table->string('codigo_postal',10);
-            $table->string('telefono',20);
+            $table->string('codigo_postal', 10);
+            $table->string('telefono', 20);
             $table->timestamps();
         });
     }

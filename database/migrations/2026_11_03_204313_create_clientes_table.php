@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('clientes', function (Blueprint $table) {
-            $table->string('DNI',13)->primary();
+            $table->string('DNI', 13)->primary();
             $table->string('nombre', 120);
             $table->string('direccion', 100);
-            $table->string('telefono',8);
+            $table->string('telefono', 8);
             $table->string('tarjeta_credito', 16)->nullable();
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('clientes');
     }
-}; 
+};
 
 // Comentario de Zulmy
