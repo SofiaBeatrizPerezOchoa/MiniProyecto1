@@ -4,58 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle del Coche</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --rc-sidebar: #a9d6e5;
+            --rc-sidebar-hover: #c6e5f0;
+            --rc-sidebar-active: #d7eef7;
+            --rc-primary: #3fa9e6;
+            --rc-primary-hover: #2f95d0;
+            --rc-text: #1f2d3d;
+        }
+
+        body {
+            background: #f4f7f9;
+            color: var(--rc-text);
+            min-height: 100vh;
+        }
+
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            flex-shrink: 0;
+            background: var(--rc-sidebar);
+            padding: 1.25rem 0.75rem;
+        }
+
+        .sidebar .brand {
+            display: block;
+            padding: 0.5rem 0.75rem 1.5rem;
+            color: var(--rc-text);
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-decoration: none;
+        }
+
+        .sidebar .nav-link {
+            margin-bottom: 0.2rem;
+            padding: 0.65rem 0.85rem;
+            color: var(--rc-text);
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover {
+            background: var(--rc-sidebar-hover);
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--rc-sidebar-active);
+            font-weight: 700;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            padding: 2rem 2.25rem;
+        }
+
+        .page-title {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .panel {
+            background: #fff;
+            border: 0;
+            border-radius: 0.9rem;
+            box-shadow: 0 0.35rem 1.2rem rgba(31, 45, 61, 0.08);
+        }
+
+        .btn-primary {
+            --bs-btn-bg: var(--rc-primary);
+            --bs-btn-border-color: var(--rc-primary);
+            --bs-btn-hover-bg: var(--rc-primary-hover);
+            --bs-btn-hover-border-color: var(--rc-primary-hover);
+            --bs-btn-active-bg: var(--rc-primary-hover);
+            --bs-btn-active-border-color: var(--rc-primary-hover);
+            border-radius: 0.55rem;
+        }
+
+        .detail-label {
+            color: #6c757d;
+            font-weight: 400;
+        }
+
+        .detail-value {
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.45em 0.8em;
+            border: 1px solid transparent;
+            border-radius: 50rem;
+            font-weight: 600;
+        }
+
+        .status-hero {
+            border: 1px solid;
+            box-shadow: 0 0.35rem 1.2rem rgba(31, 45, 61, 0.06);
+        }
+
+        .status-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            flex-shrink: 0;
+            border-radius: 0.9rem;
+            background: rgba(255, 255, 255, 0.65);
+            font-size: 1.4rem;
+        }
+
+        .status-disponible {
+            background: #e7f6ec;
+            color: #157347;
+            border-color: #badbcc;
+        }
+
+        .status-alquilado {
+            background: #fff3cd;
+            color: #997404;
+            border-color: #ffe69c;
+        }
+
+        .status-devuelto {
+            background: #e2f0fb;
+            color: #0a58ca;
+            border-color: #b6d4fe;
+        }
+
+        .status-mantenimiento {
+            background: #ffe8d6;
+            color: #b45309;
+            border-color: #ffd0a8;
+        }
+
+        .status-retrasado {
+            background: #fde2e1;
+            color: #b02a37;
+            border-color: #f5c2c7;
+        }
+
+        .status-baja {
+            background: #e9ecef;
+            color: #495057;
+            border-color: #ced4da;
+        }
+
+        .status-neutro {
+            background: #eef1f4;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        @media (max-width: 991.98px) {
+            .app-shell {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .sidebar .brand {
+                padding-bottom: 0.75rem;
+            }
+
+            .sidebar .nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+
+            .sidebar .nav-link {
+                margin-bottom: 0;
+            }
+
+            .main-content {
+                padding: 1.25rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Detalle del Coche</h1>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="{{ route('home') }}">Renta<br>Car</a>
+            <nav class="nav flex-column">
+                <a class="nav-link" href="{{ route('home') }}">Panel</a>
+                <a class="nav-link" href="{{ route('oficina.index') }}">Oficinas</a>
+                <a class="nav-link active" href="{{ route('coche.index') }}" aria-current="page">Coches</a>
+                <a class="nav-link" href="{{ route('cliente.index') }}">Clientes</a>
+                <a class="nav-link" href="{{ route('alquiler.index') }}">Alquileres</a>
+            </nav>
+        </aside>
 
-    <table border="1">
-        <tbody>
-            <tr>
-                <th>Matrícula</th>
-                <td>{{ $coche->matricula }}</td>
-            </tr>
-            <tr>
-                <th>Grupo</th>
-                <td>{{ $coche->grupo }}</td>
-            </tr>
-            <tr>
-                <th>Marca</th>
-                <td>{{ $coche->marca }}</td>
-            </tr>
-            <tr>
-                <th>Modelo</th>
-                <td>{{ $coche->modelo }}</td>
-            </tr>
-            <tr>
-                <th>Número de puertas</th>
-                <td>{{ $coche->numero_puertas }}</td>
-            </tr>
-            <tr>
-                <th>Número de plazas</th>
-                <td>{{ $coche->numero_plazas }}</td>
-            </tr>
-            <tr>
-                <th>Capacidad del maletero</th>
-                <td>{{ $coche->capacidad_maletero }}</td>
-            </tr>
-            <tr>
-                <th>Edad mínima</th>
-                <td>{{ $coche->edad_minima }}</td>
-            </tr>
-            <tr>
-                <th>Código de oficina</th>
-                <td>{{ $coche->codigo_oficina }}</td>
-            </tr>
-            <tr>
-                <th>Estado</th>
-                <td>{{ $coche->estado }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <main class="main-content">
+            @php
+                $estado = mb_strtolower(trim($coche->estado));
+                $estadoClase = match ($estado) {
+                    'disponible' => 'status-disponible',
+                    'alquilado' => 'status-alquilado',
+                    'devuelto' => 'status-devuelto',
+                    'en mantenimiento' => 'status-mantenimiento',
+                    'retrasado' => 'status-retrasado',
+                    'en baja' => 'status-baja',
+                    default => 'status-neutro',
+                };
+                $estadoIcono = match ($estado) {
+                    'disponible' => 'bi-check-circle',
+                    'alquilado' => 'bi-key',
+                    'devuelto' => 'bi-arrow-return-left',
+                    'en mantenimiento' => 'bi-tools',
+                    'retrasado' => 'bi-clock-history',
+                    'en baja' => 'bi-x-circle',
+                    default => 'bi-info-circle',
+                };
+            @endphp
 
-    <p>
-        <a href="{{ route('coche.edit', $coche->id) }}">Editar</a>
-        <a href="{{ route('coche.index') }}">Volver al listado</a>
-    </p>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <h1 class="page-title h2 mb-1">Detalle del Coche</h1>
+                    <p class="text-muted mb-0">{{ $coche->marca }} {{ $coche->modelo }} · {{ $coche->matricula }}</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('coche.edit', $coche->id) }}" class="btn btn-primary px-4">
+                        <i class="bi bi-pencil-square me-1"></i>Editar
+                    </a>
+                    <a href="{{ route('coche.index') }}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left me-1"></i>Volver al listado
+                    </a>
+                </div>
+            </div>
+
+            <div class="status-hero {{ $estadoClase }} rounded-4 p-3 p-md-4 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="status-icon"><i class="bi {{ $estadoIcono }}"></i></span>
+                    <div>
+                        <div class="small text-uppercase fw-semibold opacity-75">Estado actual</div>
+                        <div class="fs-4 fw-bold">{{ $coche->estado }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-12 col-lg-7">
+                    <div class="panel p-4 h-100">
+                        <h2 class="h5 fw-bold mb-3">Identificación</h2>
+                        <dl class="row gy-3 mb-0">
+                            <dt class="col-sm-4 detail-label mb-0">Matrícula</dt>
+                            <dd class="col-sm-8 detail-value mb-0">{{ $coche->matricula }}</dd>
+
+                            <dt class="col-sm-4 detail-label mb-0">Marca</dt>
+                            <dd class="col-sm-8 detail-value mb-0">{{ $coche->marca }}</dd>
+
+                            <dt class="col-sm-4 detail-label mb-0">Modelo</dt>
+                            <dd class="col-sm-8 detail-value mb-0">{{ $coche->modelo }}</dd>
+
+                            <dt class="col-sm-4 detail-label mb-0">Grupo</dt>
+                            <dd class="col-sm-8 detail-value mb-0">{{ $coche->grupo }}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-5">
+                    <div class="panel p-4 mb-4">
+                        <h2 class="h5 fw-bold mb-3">Características</h2>
+                        <dl class="row gy-3 mb-0">
+                            <dt class="col-sm-7 detail-label mb-0">Número de puertas</dt>
+                            <dd class="col-sm-5 detail-value mb-0">{{ $coche->numero_puertas }}</dd>
+
+                            <dt class="col-sm-7 detail-label mb-0">Número de plazas</dt>
+                            <dd class="col-sm-5 detail-value mb-0">{{ $coche->numero_plazas }}</dd>
+
+                            <dt class="col-sm-7 detail-label mb-0">Capacidad del maletero</dt>
+                            <dd class="col-sm-5 detail-value mb-0">{{ $coche->capacidad_maletero }} L</dd>
+
+                            <dt class="col-sm-7 detail-label mb-0">Edad mínima</dt>
+                            <dd class="col-sm-5 detail-value mb-0">{{ $coche->edad_minima }} años</dd>
+                        </dl>
+                    </div>
+
+                    <div class="panel p-4">
+                        <h2 class="h5 fw-bold mb-3">Disponibilidad</h2>
+                        <dl class="row gy-3 mb-0">
+                            <dt class="col-sm-7 detail-label mb-0">Código de oficina</dt>
+                            <dd class="col-sm-5 detail-value mb-0">{{ $coche->codigo_oficina }}</dd>
+
+                            <dt class="col-sm-7 detail-label mb-0">Estado</dt>
+                            <dd class="col-sm-5 mb-0">
+                                <span class="badge status-badge {{ $estadoClase }}">
+                                    <i class="bi {{ $estadoIcono }} me-1"></i>{{ $coche->estado }}
+                                </span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

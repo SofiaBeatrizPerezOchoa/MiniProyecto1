@@ -5,7 +5,7 @@
 - Proyecto Laravel 13 con MySQL (`miniproyecto`) para gestion de alquiler de coches.
 - Modulos existentes: Clientes, Oficinas, Coches y Alquileres.
 - Las migraciones ya estan ejecutadas en la base de datos local.
-- El comando `php` del sistema (8.2.33) no es compatible con las dependencias; usar `C:\laragon\bin\php\php-8.4.25-Win32-vs17-x64\php.exe`.
+- El comando `php` del sistema (8.3.33) no es compatible con las dependencias; usar `C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\php.exe`.
 
 ## Modulo Coches
 
@@ -40,8 +40,8 @@
 
 ### Decisiones
 
-- Sin pantallas con interfaz grafica elaborada: solo Blade + HTML basico.
-- `estado` y `codigo_oficina` son texto libre (sin select ni clave foranea) para mantenerlo simple.
+- Interfaz visual con Bootstrap 5.3.3 por CDN; las vistas de Coches son independientes (sin layout global).
+- `codigo_oficina` sigue siendo texto libre; `grupo` y `estado` se seleccionan desde combobox en los formularios.
 - No se agregaron seeders ni datos de prueba.
 
 ### Verificacion realizada (2026-11-04)
@@ -52,8 +52,22 @@
 - `pint` y `phpstan` pasan para `Coche.php` y `CocheController.php`.
 - El lint global del repo sigue fallando por archivos de otros modulos (Clientes, Oficinas, Alquileres, migraciones y `routes/web.php`), no por el modulo Coches.
 
+### Interfaz visual con Bootstrap (2026-11-05)
+
+- Se agrego Bootstrap 5.3.3 por CDN (CSS y JS bundle) a las cuatro vistas de Coches.
+- Se implemento un sidebar comun con la marca `Renta Car` y enlaces a Panel, Oficinas, Coches, Clientes y Alquileres.
+- `coche/index.blade.php`: encabezado con boton `Nuevo Coche`, busqueda por matricula/marca/modelo, filtro de grupo por combobox, botones `Filtrar` / `Limpiar`, tabla responsive con todos los campos, badges distintivos por estado y acciones con iconos.
+- `coche/create.blade.php` y `coche/edit.blade.php`: formulario en tarjeta con grid de 3 columnas, placeholders, asteriscos en campos obligatorios, errores por campo y resumen de validacion.
+- `grupo` ahora es un select con `Grupo A` a `Grupo F`; `estado` es un select con `Disponible`, `Alquilado`, `Devuelto`, `En Mantenimiento`, `Retrasado` y `En baja`. En edicion se conserva el valor actual si no pertenece a la lista.
+- La capacidad del maletero se muestra y solicita en litros.
+- `coche/show.blade.php`: ficha de detalle organizada en tarjetas y bloque destacado con icono y color segun el estado.
+- Se agrego Bootstrap Icons 1.11.3 por CDN para los iconos de acciones y estados.
+- No se modifico el controlador, modelo, rutas ni migraciones.
+- Verificacion (2026-11-05): `view:cache` compilo correctamente, las 7 rutas de coche estan registradas y las 4 vistas respondieron HTTP 200 con los datos existentes.
+
 ## Pendientes / notas
 
 - `AGENTS.md` esta en `.gitignore`; si se quiere compartir con el equipo hay que quitar esa linea o forzar `git add -f AGENTS.md`.
 - Falta que el equipo integre y pruebe el modulo en conjunto con Oficinas y Alquileres.
+- Revisar visualmente las cuatro pantallas en el navegador con datos reales y en tamano movil.
 - Seria recomendable agregar pruebas feature del CRUD de coches mas adelante.
