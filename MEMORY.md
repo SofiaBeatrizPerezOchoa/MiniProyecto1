@@ -4,6 +4,7 @@
 
 - Proyecto Laravel 13 con MySQL (`miniproyecto`) para gestion de alquiler de coches.
 - Modulos existentes: Clientes, Oficinas, Coches y Alquileres.
+- `AGENTS.md` esta en `.gitignore`; si se quiere compartir con el equipo hay que quitar esa linea o forzar `git add -f AGENTS.md`.
 - Las migraciones ya estan ejecutadas en la base de datos local.
 - El comando `php` del sistema (8.3.33) no es compatible con las dependencias; usar `C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\php.exe`.
 
@@ -113,6 +114,46 @@
 - Migracion `change_dni_to_string_on_alquilers_table` ejecutada correctamente; la columna `alquilers.dni` quedo como `varchar(13)`.
 - Prueba temporal del DNI de 13 digitos (alta, edicion, borrado y rechazo de DNI de 8 digitos): 2 pruebas, 13 aserciones, todas correctas. Los datos se revirtieron; la tabla `alquilers` quedo vacia.
 - `pint` y `phpstan` pasan para `Alquiler.php`, `AlquilerController.php` y la migracion.
+
+## Modulo Clientes
+
+### Completado
+
+- `Cliente` ahora tiene `$primaryKey = 'DNI'`, `$incrementing = false`, `$keyType = 'string'` y `$fillable` con todos los campos de la tabla.
+- `ClienteController` implementa el CRUD completo:
+  - `index`: lista todos los clientes.
+  - `create`: muestra formulario de alta.
+  - `store`: valida y guarda.
+  - `show`: muestra el detalle.
+  - `edit`: muestra formulario de edicion precargado.
+  - `update`: valida y actualiza (DNI unico ignorando el registro actual).
+  - `destroy`: elimina el registro.
+- Vistas creadas/actualizadas:
+  - `cliente/index.blade.php`: tabla con todos los campos y acciones Ver / Editar / Eliminar.
+  - `cliente/create.blade.php`: formulario de alta.
+  - `cliente/edit.blade.php`: formulario de edicion precargado.
+  - `cliente/details.blade.php`: ficha de detalle (`show`).
+- La eliminacion usa `POST` + `@method('DELETE')`, no enlaces GET.
+- Se corrigio `cliente/index.blade.php`, que antes usaba `{{$cliente->id}}` (inexistente, PK es `DNI`) y enlaces GET a `/delete` (incorrectos).
+
+### Reglas de validacion aplicadas
+
+- `DNI`: requerido, string, max 13, unico.
+- `nombre`: requerido, string, max 120.
+- `direccion`: requerido, string, max 100.
+- `telefono`: requerido, string, max 8.
+- `tarjeta_credito`: opcional, string, max 16.
+
+### Decisiones
+
+- Interfaz visual con Bootstrap 5.3.3 por CDN; las vistas de Clientes son independientes (sin layout global), siguiendo el diseno de Coches/Oficinas/Alquileres.
+- El segmento de ruta se resuelve por `DNI` (clave primaria), no por `id`.
+- No se agregaron seeders ni datos de prueba.
+
+### Verificacion realizada (2026-11-05)
+
+- La ruta resource de `cliente` esta registrada.
+- `view:cache` compila correctamente las vistas Blade de Clientes.
 
 ## Pendientes / notas
 
