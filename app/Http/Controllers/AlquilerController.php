@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Alquiler;
+use Illuminate\Http\Request;
 
 class AlquilerController extends Controller
 {
@@ -13,6 +13,7 @@ class AlquilerController extends Controller
     public function index()
     {
         $datosAlquileres = Alquiler::all();
+
         return view('alquiler.index')->with('alquileres', $datosAlquileres);
     }
 

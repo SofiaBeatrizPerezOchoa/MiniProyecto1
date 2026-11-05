@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('alquilers', function (Blueprint $table) {
             $table->id();
-            $table->string('matricula',20);
+            $table->string('matricula', 20);
             $table->integer('dni');
 
             $table->date('fecha_inicio');
@@ -22,10 +22,10 @@ return new class extends Migration
 
             $table->integer('duracion_dias');
 
-            $table->string('tipo_seguro',30);
+            $table->string('tipo_seguro', 30);
 
-            $table->decimal('precio_total',10,2);
-            $table->decimal('recargo',10,2);
+            $table->decimal('precio_total', 10, 2);
+            $table->decimal('recargo', 10, 2);
             $table->timestamps();
         });
     }
