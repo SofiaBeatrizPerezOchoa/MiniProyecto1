@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class OficinaController extends Controller
-
+{
     /**
      * Display a listing of the resource.
      */
@@ -23,7 +23,7 @@ class OficinaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): void
+    public function create(): View
     {
         return view('oficina.create');
     }
