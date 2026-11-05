@@ -65,6 +65,55 @@
 - No se modifico el controlador, modelo, rutas ni migraciones.
 - Verificacion (2026-11-05): `view:cache` compilo correctamente, las 7 rutas de coche estan registradas y las 4 vistas respondieron HTTP 200 con los datos existentes.
 
+## Modulo Alquileres
+
+### Completado (2026-11-05)
+
+- `Alquiler` ahora tiene `$fillable` con todos los campos de la tabla y `$casts` para fechas, enteros y decimales.
+- `AlquilerController` implementa el CRUD completo:
+  - `index`: lista los alquileres mas recientes.
+  - `create`: muestra formulario de alta.
+  - `store`: valida y guarda.
+  - `show`: muestra el detalle.
+  - `edit`: muestra formulario de edicion precargado.
+  - `update`: valida y actualiza.
+  - `destroy`: elimina el registro.
+- Vistas creadas/actualizadas:
+  - `alquiler/index.blade.php`: tabla con todos los campos, filtros por texto, seguro y estado, botones `Filtrar` / `Limpiar` y acciones Ver / Editar / Eliminar.
+  - `alquiler/create.blade.php`: formulario de alta con botones `Guardar Alquiler`, `Limpiar` y `Cancelar`.
+  - `alquiler/edit.blade.php`: formulario de edicion precargado con botones `Guardar cambios`, `Limpiar` y `Cancelar`.
+  - `alquiler/show.blade.php`: ficha de detalle con estado de devolucion y botones Editar / Volver.
+- La eliminacion usa `POST` + `@method('DELETE')`.
+- Se reemplazo la vista `index` anterior, que usaba relaciones inexistentes (`cliente`, `coche`) y campos que no existen en la tabla (`fecha_fin`, `costo_total`).
+
+### Reglas de validacion aplicadas
+
+- `matricula`: requerida, string, max 20.
+- `dni`: requerido, string de exactamente 13 digitos.
+- `fecha_inicio`: requerida, fecha.
+- `fecha_devolucion_prevista`: requerida, fecha, mayor o igual a `fecha_inicio`.
+- `fecha_devolucion_real`: opcional, fecha, mayor o igual a `fecha_inicio`.
+- `duracion_dias`: requerido, entero, minimo 1.
+- `tipo_seguro`: requerido, string, max 30.
+- `precio_total` y `recargo`: requeridos, numericos, minimo 0.
+
+### Decisiones
+
+- Se implemento **sin relaciones Eloquent**: `matricula` y `dni` se capturan como datos libres y no se valida su existencia en `coches` o `clientes`.
+- `dni` se cambio de `int` a `varchar(13)` mediante la migracion `2026_11_05_170203_change_dni_to_string_on_alquilers_table.php` para aceptar exactamente 13 digitos (incluidos ceros iniciales).
+- `tipo_seguro` es un select con `Basico`, `Completo`, `Premium` y `Sin seguro`; al editar se conserva el valor actual si no pertenece a la lista.
+- El estado mostrado se deriva de `fecha_devolucion_real`: `Devuelto` si tiene fecha, `Pendiente` si esta vacia.
+- Se mantiene el diseno Bootstrap 5.3.3 de Coches/Oficinas: sidebar `Renta Car`, tarjetas, badges, filtros y botones de accion.
+
+### Verificacion realizada (2026-11-05)
+
+- Las 7 rutas resource de `alquiler` estan registradas.
+- `view:cache` compilo correctamente las vistas Blade.
+- Prueba temporal de integracion (crear, listar, ver, editar, eliminar y validaciones): 2 pruebas, 21 aserciones, todas correctas. Los datos se revirtieron; la tabla `alquilers` quedo vacia.
+- Migracion `change_dni_to_string_on_alquilers_table` ejecutada correctamente; la columna `alquilers.dni` quedo como `varchar(13)`.
+- Prueba temporal del DNI de 13 digitos (alta, edicion, borrado y rechazo de DNI de 8 digitos): 2 pruebas, 13 aserciones, todas correctas. Los datos se revirtieron; la tabla `alquilers` quedo vacia.
+- `pint` y `phpstan` pasan para `Alquiler.php`, `AlquilerController.php` y la migracion.
+
 ## Pendientes / notas
 
 - `AGENTS.md` esta en `.gitignore`; si se quiere compartir con el equipo hay que quitar esa linea o forzar `git add -f AGENTS.md`.
