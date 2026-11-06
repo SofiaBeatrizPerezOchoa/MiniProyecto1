@@ -43,18 +43,29 @@ class LoginTest extends TestCase
     {
         $response = $this->post('/login', [
             'username' => 'admin',
-            'password' => 'password',
+            'password' => '12345678',
         ]);
 
         $response->assertRedirect('/');
         $this->assertAuthenticatedAs(User::where('username', 'admin')->firstOrFail());
     }
 
+    public function test_employee_can_login_with_demo_credentials(): void
+    {
+        $response = $this->post('/login', [
+            'username' => 'empleado',
+            'password' => '12345678',
+        ]);
+
+        $response->assertRedirect('/');
+        $this->assertAuthenticatedAs(User::where('username', 'empleado')->firstOrFail());
+    }
+
     public function test_username_is_normalized_before_authentication(): void
     {
         $response = $this->post('/login', [
             'username' => '  AD MIN  ',
-            'password' => 'password',
+            'password' => '12345678',
         ]);
 
         $response->assertRedirect('/');
@@ -79,7 +90,7 @@ class LoginTest extends TestCase
 
         $response = $this->post('/login', [
             'username' => 'admin',
-            'password' => 'password',
+            'password' => '12345678',
         ]);
 
         $response->assertSessionHasErrors(['username' => 'Usuario o contraseña incorrectos.']);

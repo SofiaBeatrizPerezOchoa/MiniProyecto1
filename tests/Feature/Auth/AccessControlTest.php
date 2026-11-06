@@ -96,13 +96,6 @@ class AccessControlTest extends TestCase
 
     private function crearEmpleado(): User
     {
-        $employee = User::factory()->create([
-            'name' => 'Empleado de Prueba',
-            'username' => 'empleado',
-        ]);
-
-        $employee->assignRole('empleado');
-
-        return $employee;
+        return User::where('username', 'empleado')->firstOrFail();
     }
 }

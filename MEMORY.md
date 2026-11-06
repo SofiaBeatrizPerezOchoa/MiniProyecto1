@@ -172,7 +172,10 @@
   - No se puede deshabilitar la propia cuenta ni el ultimo administrador activo.
   - El ultimo administrador activo no puede perder el rol `administrador`.
 - Migracion `2026_11_06_060000_add_username_and_activo_to_users_table.php` y migracion de Spatie ejecutadas en la base local.
-- `RolesAndAdminUserSeeder` es idempotente: crea los roles y el usuario inicial `admin` / `12345678` (nombre `Administrador`, activo, rol `administrador`). `DatabaseSeeder` lo invoca.
+- `RolesAndAdminUserSeeder` es idempotente: crea los roles y los usuarios demo `admin` / `12345678` (rol `administrador`) y `empleado` / `12345678` (rol `empleado`), ambos activos y sin email. `DatabaseSeeder` lo invoca.
+- Se agrego el script `composer db:setup` (`migrate --force` + `db:seed --force`) para preparar una maquina con un solo comando.
+- `README.md` documenta instalacion, configuracion, credenciales demo y comando de pruebas.
+- No se exige verificacion de correo: se quitaron las referencias de `email_verified_at` en `User` y `UserFactory`; la columna sigue existiendo como nullable pero sin uso.
 - Layout compartido:
   - `layouts/app.blade.php` con sidebar condicional por rol.
   - `layouts/guest.blade.php` para login.
@@ -180,14 +183,15 @@
   - Las 16 vistas de alquiler, coche, cliente y oficina se refactorizaron a `@extends('layouts.app')` conservando su contenido.
 - Mensajes en espanol en `lang/es/auth.php` y `lang/es/validation.php`; `APP_LOCALE=es`.
 - Rate limiter `login`: 5 intentos por minuto por username + IP.
-- Pruebas creadas en `tests/Feature/Auth/` y `tests/Feature/Usuario/UsuarioManagementTest.php`.
+- Pruebas creadas en `tests/Feature/Auth/`, `tests/Feature/Usuario/UsuarioManagementTest.php` y `tests/Feature/Usuario/DemoUsersSeederTest.php`.
 
 ### Verificacion realizada
 
-- `vendor/bin/pest`: 24 pruebas, 24 correctas, 95 aserciones.
+- `vendor/bin/pest`: 27 pruebas, 27 correctas, 111 aserciones.
 - `pint --test` y `phpstan analyse --memory-limit=1G`: correctos para los archivos modificados/nuevos.
 - `view:cache`: compila correctamente todas las vistas.
-- Seeder ejecutado dos veces sin duplicar roles ni usuarios; `admin` queda con rol `administrador`.
+- `composer db:setup` ejecutado correctamente en la base local; el seeder puede ejecutarse varias veces sin duplicar roles ni usuarios.
+- Seeder verificado con `admin` y `empleado`, ambos activos, con rol correcto y contrasena `12345678`.
 
 ### Nota sobre pruebas y SQLite
 
@@ -206,3 +210,4 @@
 - Evaluar permisos granulares con Spatie; actualmente el control de acceso es por rol.
 - Revisar visualmente login, dashboard, modulo de usuarios y sidebar en tamano movil.
 - Habilitar `pdo_sqlite` y `sqlite3` en el `php.ini` de PHP 8.4.25 para poder usar `artisan test` sin parametros `-d`.
+- Las credenciales demo (`admin` y `empleado` con `12345678`) son solo para desarrollo; cambiarlas antes de publicar el sistema.

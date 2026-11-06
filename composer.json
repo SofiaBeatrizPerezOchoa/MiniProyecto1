@@ -50,6 +50,10 @@
             "npm install",
             "npm run build"
         ],
+        "db:setup": [
+            "@php artisan migrate --force",
+            "@php artisan db:seed --force"
+        ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
