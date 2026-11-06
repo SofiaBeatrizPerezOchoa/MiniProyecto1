@@ -6,7 +6,7 @@
 - Modulos existentes: Clientes, Oficinas, Coches y Alquileres.
 - `AGENTS.md` esta en `.gitignore`; si se quiere compartir con el equipo hay que quitar esa linea o forzar `git add -f AGENTS.md`.
 - Las migraciones ya estan ejecutadas en la base de datos local.
-- El comando `php` del sistema (8.3.33) no es compatible con las dependencias; usar `C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\php.exe`.
+- El comando `php` del sistema (8.3.33) no es compatible con las dependencias; usar `C:\laragon\bin\php\php-8.4.25-Win32-vs17-x64\php.exe`.
 
 ## Modulo Coches
 
@@ -41,7 +41,7 @@
 
 ### Decisiones
 
-- Interfaz visual con Bootstrap 5.3.3 por CDN; las vistas de Coches son independientes (sin layout global).
+- Interfaz visual con Bootstrap 5.3.3 por CDN; desde el 2026-11-06 las vistas de Coches usan el layout compartido `layouts.app`.
 - `codigo_oficina` sigue siendo texto libre; `grupo` y `estado` se seleccionan desde combobox en los formularios.
 - No se agregaron seeders ni datos de prueba.
 
@@ -146,7 +146,7 @@
 
 ### Decisiones
 
-- Interfaz visual con Bootstrap 5.3.3 por CDN; las vistas de Clientes son independientes (sin layout global), siguiendo el diseno de Coches/Oficinas/Alquileres.
+- Interfaz visual con Bootstrap 5.3.3 por CDN; desde el 2026-11-06 las vistas de Clientes usan el layout compartido `layouts.app`.
 - El segmento de ruta se resuelve por `DNI` (clave primaria), no por `id`.
 - No se agregaron seeders ni datos de prueba.
 
@@ -155,9 +155,54 @@
 - La ruta resource de `cliente` esta registrada.
 - `view:cache` compila correctamente las vistas Blade de Clientes.
 
+## Autenticacion, roles y modulo Usuarios (2026-11-06)
+
+### Completado
+
+- Autenticacion por `username` + `password` con `LoginController` (`GET/POST /login`, `POST /logout`). No hay registro publico (`/registro` y `/register` devuelven 404).
+- Login redirige a `/`; `/` es el dashboard protegido por `auth` y muestra "Bienvenido a RENTA CAR".
+- Se usa `spatie/laravel-permission` con roles `administrador` y `empleado`.
+- Matriz de acceso:
+  - `administrador`: cliente, coche, alquiler, oficina y usuario.
+  - `empleado`: cliente, coche y alquiler.
+- `UsuarioController` implementa index, create, store, edit, update y `PATCH /usuario/{usuario}/estado` (habilitar/deshabilitar). No hay `show` ni `destroy`.
+- Reglas del modulo Usuarios:
+  - `username` unico, normalizado a minusculas y sin espacios; `email` nullable; `activo` booleano (default `true`).
+  - Contrasena obligatoria al crear y opcional al editar (minimo 8, confirmada).
+  - No se puede deshabilitar la propia cuenta ni el ultimo administrador activo.
+  - El ultimo administrador activo no puede perder el rol `administrador`.
+- Migracion `2026_11_06_060000_add_username_and_activo_to_users_table.php` y migracion de Spatie ejecutadas en la base local.
+- `RolesAndAdminUserSeeder` es idempotente: crea los roles y el usuario inicial `admin` / `12345678` (nombre `Administrador`, activo, rol `administrador`). `DatabaseSeeder` lo invoca.
+- Layout compartido:
+  - `layouts/app.blade.php` con sidebar condicional por rol.
+  - `layouts/guest.blade.php` para login.
+  - `layouts/partials/theme.blade.php` con el CSS comun.
+  - Las 16 vistas de alquiler, coche, cliente y oficina se refactorizaron a `@extends('layouts.app')` conservando su contenido.
+- Mensajes en espanol en `lang/es/auth.php` y `lang/es/validation.php`; `APP_LOCALE=es`.
+- Rate limiter `login`: 5 intentos por minuto por username + IP.
+- Pruebas creadas en `tests/Feature/Auth/` y `tests/Feature/Usuario/UsuarioManagementTest.php`.
+
+### Verificacion realizada
+
+- `vendor/bin/pest`: 24 pruebas, 24 correctas, 95 aserciones.
+- `pint --test` y `phpstan analyse --memory-limit=1G`: correctos para los archivos modificados/nuevos.
+- `view:cache`: compila correctamente todas las vistas.
+- Seeder ejecutado dos veces sin duplicar roles ni usuarios; `admin` queda con rol `administrador`.
+
+### Nota sobre pruebas y SQLite
+
+- PHP 8.4.25 tiene los DLL `php_pdo_sqlite.dll` y `php_sqlite3.dll`, pero no estan habilitados en `php.ini`.
+- `php artisan test` lanza un subproceso que no hereda los `-d`, por lo que falla con "could not find driver".
+- Comando de pruebas que funciona:
+  `C:\laragon\bin\php\php-8.4.25-Win32-vs17-x64\php.exe -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/pest`
+- Alternativa futura: habilitar `extension=pdo_sqlite` y `extension=sqlite3` en el `php.ini` de PHP 8.4.25.
+
 ## Pendientes / notas
 
 - `AGENTS.md` esta en `.gitignore`; si se quiere compartir con el equipo hay que quitar esa linea o forzar `git add -f AGENTS.md`.
 - Falta que el equipo integre y pruebe el modulo en conjunto con Oficinas y Alquileres.
 - Revisar visualmente las cuatro pantallas en el navegador con datos reales y en tamano movil.
 - Seria recomendable agregar pruebas feature del CRUD de coches mas adelante.
+- Evaluar permisos granulares con Spatie; actualmente el control de acceso es por rol.
+- Revisar visualmente login, dashboard, modulo de usuarios y sidebar en tamano movil.
+- Habilitar `pdo_sqlite` y `sqlite3` en el `php.ini` de PHP 8.4.25 para poder usar `artisan test` sin parametros `-d`.
