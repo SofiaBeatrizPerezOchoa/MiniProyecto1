@@ -27,7 +27,8 @@
                     @csrf
 
                     @php
-                        $segurosDisponibles = ['Básico', 'Completo', 'Premium', 'Sin seguro'];
+                        $tarifasSeguro = \App\Models\Alquiler::TARIFAS_SEGURO;
+                        $segurosDisponibles = array_keys($tarifasSeguro);
                     @endphp
 
                     <div class="row g-3">
@@ -53,9 +54,10 @@
                             <select id="tipo_seguro" name="tipo_seguro" class="form-select @error('tipo_seguro') is-invalid @enderror" required>
                                 <option value="" disabled @selected(!old('tipo_seguro'))>Seleccione un seguro</option>
                                 @foreach($segurosDisponibles as $seguro)
-                                    <option value="{{ $seguro }}" @selected(old('tipo_seguro') === $seguro)>{{ $seguro }}</option>
+                                    <option value="{{ $seguro }}" data-precio="{{ $tarifasSeguro[$seguro] }}" @selected(old('tipo_seguro') === $seguro)>{{ $seguro }}</option>
                                 @endforeach
                             </select>
+                            <div class="form-text" id="tarifaSeguroInfo">Selecciona un seguro para ver su precio por día.</div>
                             @error('tipo_seguro')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -88,28 +90,33 @@
 
                         <div class="col-12 col-md-4">
                             <label for="duracion_dias" class="form-label">Duración en días <span class="required-mark">*</span></label>
-                            <input type="number" id="duracion_dias" name="duracion_dias" value="{{ old('duracion_dias') }}" class="form-control @error('duracion_dias') is-invalid @enderror" min="1" step="1" placeholder="Ingrese la duración" required>
+                            <input type="number" id="duracion_dias" name="duracion_dias" value="{{ old('duracion_dias') }}" class="form-control @error('duracion_dias') is-invalid @enderror" min="1" step="1" placeholder="Se calcula automáticamente" readonly required>
+                            <div class="form-text"></div>
                             @error('duracion_dias')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <label for="precio_total" class="form-label">Precio total <span class="required-mark">*</span></label>
-                            <input type="number" id="precio_total" name="precio_total" value="{{ old('precio_total') }}" class="form-control @error('precio_total') is-invalid @enderror" min="0" step="0.01" placeholder="0.00" required>
+                            <label for="precio_total" class="form-label">Precio total (L) <span class="required-mark">*</span></label>
+                            <input type="number" id="precio_total" name="precio_total" value="{{ old('precio_total') }}" class="form-control @error('precio_total') is-invalid @enderror" min="0" step="0.01" placeholder="Se calcula automáticamente" readonly required>
+                            <div class="form-text"></div>
                             @error('precio_total')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <label for="recargo" class="form-label">Recargo <span class="required-mark">*</span></label>
-                            <input type="number" id="recargo" name="recargo" value="{{ old('recargo') }}" class="form-control @error('recargo') is-invalid @enderror" min="0" step="0.01" placeholder="0.00" required>
+                            <label for="recargo" class="form-label">Recargo por retraso (L) <span class="required-mark">*</span></label>
+                            <input type="number" id="recargo" name="recargo" value="{{ old('recargo', 0) }}" class="form-control @error('recargo') is-invalid @enderror" min="0" step="0.01" placeholder="Se calcula automáticamente" readonly required>
+                            <div class="form-text">L 250 por cada día de retraso respecto a la devolución prevista.</div>
                             @error('recargo')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
+
+                    @include('alquiler.partials.calculos')
 
                     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
                         <button type="submit" class="btn btn-primary px-4">Guardar Alquiler</button>

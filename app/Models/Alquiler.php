@@ -6,6 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Alquiler extends Model
 {
+    /**
+     * Precio diario de cada tipo de seguro.
+     *
+     * @var array<string, float>
+     */
+    public const TARIFAS_SEGURO = [
+        'Básico' => 175.0,
+        'Completo' => 350.0,
+        'Premium' => 500.0,
+        'Sin seguro' => 0.0,
+    ];
+
+    /**
+     * Recargo diario en lempiras cuando la devolucion supera la fecha prevista.
+     */
+    public const RECARGO_POR_DIA = 250.0;
+
     protected $fillable = [
         'matricula',
         'dni',

@@ -84,10 +84,10 @@
                         <h2 class="h5 fw-bold mb-3">Importes</h2>
                         <dl class="row gy-3 mb-0">
                             <dt class="col-sm-7 detail-label mb-0">Precio total</dt>
-                            <dd class="col-sm-5 detail-value mb-0">${{ number_format((float) $alquiler->precio_total, 2) }}</dd>
+                            <dd class="col-sm-5 detail-value mb-0">L {{ number_format((float) $alquiler->precio_total, 2) }}</dd>
 
-                            <dt class="col-sm-7 detail-label mb-0">Recargo</dt>
-                            <dd class="col-sm-5 detail-value mb-0">${{ number_format((float) $alquiler->recargo, 2) }}</dd>
+                            <dt class="col-sm-7 detail-label mb-0">Recargo por retraso</dt>
+                            <dd class="col-sm-5 detail-value mb-0">L {{ number_format((float) $alquiler->recargo, 2) }}</dd>
                         </dl>
                     </div>
                 </div>

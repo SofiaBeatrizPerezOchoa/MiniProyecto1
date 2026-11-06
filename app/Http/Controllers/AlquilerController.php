@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Alquiler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class AlquilerController extends Controller
@@ -32,7 +33,7 @@ class AlquilerController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $datosAlquiler = $request->validate($this->reglasValidacion());
+        $datosAlquiler = $this->calcularDatosAlquiler($request->validate($this->reglasValidacion()));
 
         Alquiler::create($datosAlquiler);
 
@@ -66,7 +67,7 @@ class AlquilerController extends Controller
     {
         $alquiler = Alquiler::findOrFail($id);
 
-        $datosAlquiler = $request->validate($this->reglasValidacion());
+        $datosAlquiler = $this->calcularDatosAlquiler($request->validate($this->reglasValidacion()));
 
         $alquiler->update($datosAlquiler);
 
@@ -97,10 +98,39 @@ class AlquilerController extends Controller
             'fecha_inicio' => 'required|date',
             'fecha_devolucion_prevista' => 'required|date|after_or_equal:fecha_inicio',
             'fecha_devolucion_real' => 'nullable|date|after_or_equal:fecha_inicio',
-            'duracion_dias' => 'required|integer|min:1',
             'tipo_seguro' => 'required|string|max:30',
-            'precio_total' => 'required|numeric|min:0',
-            'recargo' => 'required|numeric|min:0',
         ];
+    }
+
+    /**
+     * Calcula la duracion del alquiler y el precio total a partir de las fechas
+     * y del tipo de seguro seleccionado.
+     *
+     * @param  array<string, mixed>  $datos
+     * @return array<string, mixed>
+     */
+    private function calcularDatosAlquiler(array $datos): array
+    {
+        $inicio = Carbon::parse($datos['fecha_inicio'])->startOfDay();
+        $devolucionPrevista = Carbon::parse($datos['fecha_devolucion_prevista'])->startOfDay();
+        $devolucionReal = ! empty($datos['fecha_devolucion_real'])
+            ? Carbon::parse($datos['fecha_devolucion_real'])->startOfDay()
+            : null;
+
+        $duracionDias = max(1, (int) abs($inicio->diffInDays($devolucionPrevista)));
+        $tarifaSeguro = Alquiler::TARIFAS_SEGURO[$datos['tipo_seguro']] ?? 0.0;
+
+        $diasRetraso = 0;
+        if ($devolucionReal !== null && $devolucionReal->greaterThan($devolucionPrevista)) {
+            $diasRetraso = (int) abs($devolucionPrevista->diffInDays($devolucionReal));
+        }
+
+        $recargo = $diasRetraso * Alquiler::RECARGO_POR_DIA;
+
+        $datos['duracion_dias'] = $duracionDias;
+        $datos['recargo'] = round($recargo, 2);
+        $datos['precio_total'] = round(($duracionDias * $tarifaSeguro) + $recargo, 2);
+
+        return $datos;
     }
 }

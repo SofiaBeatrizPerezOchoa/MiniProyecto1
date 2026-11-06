@@ -101,8 +101,8 @@
                                     <td>{{ $alquiler->fecha_devolucion_real?->format('d/m/Y') ?? '—' }}</td>
                                     <td>{{ $alquiler->duracion_dias }}</td>
                                     <td>{{ $alquiler->tipo_seguro }}</td>
-                                    <td>${{ number_format((float) $alquiler->precio_total, 2) }}</td>
-                                    <td>${{ number_format((float) $alquiler->recargo, 2) }}</td>
+                                    <td>L {{ number_format((float) $alquiler->precio_total, 2) }}</td>
+                                    <td>L {{ number_format((float) $alquiler->recargo, 2) }}</td>
                                     <td>
                                         <span class="badge status-badge {{ $estadoClase }}">{{ $estadoTexto }}</span>
                                     </td>
