@@ -28,7 +28,7 @@
 
                     @php
                         $tarifasSeguro = \App\Models\Alquiler::TARIFAS_SEGURO;
-                        $segurosDisponibles = array_keys($tarifasSeguro);
+                        $segurosDisponibles = array_values(array_diff(array_keys($tarifasSeguro), ['Sin seguro']));
                     @endphp
 
                     <div class="row g-3">
