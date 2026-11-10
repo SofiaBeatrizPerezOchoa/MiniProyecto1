@@ -17,6 +17,23 @@
                 </div>
             @endif
 
+            <form action="{{ route('cliente.index') }}" method="GET" class="row g-2 align-items-end mb-3">
+                <div class="col-12 col-lg-6">
+                    <label for="buscar" class="form-label small text-muted mb-1">Buscar cliente</label>
+                    <input type="text" id="buscar" name="buscar" value="{{ $filtros['buscar'] }}" class="form-control" placeholder="DNI, nombre, dirección o teléfono">
+                </div>
+                <div class="col-12 col-lg-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-funnel me-1"></i>Filtrar
+                        </button>
+                        <a href="{{ route('cliente.index') }}" class="btn btn-outline-secondary flex-fill">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+
             <div class="panel p-3 p-md-4">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="tablaClientes">
@@ -59,13 +76,21 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="text-center text-muted py-4">
-                                        No hay clientes registrados. <a href="{{ route('cliente.create') }}">Crea el primero</a>.
+                                        @if($filtros['buscar'] !== '')
+                                            No hay clientes que coincidan con los filtros.
+                                        @else
+                                            No hay clientes registrados. <a href="{{ route('cliente.create') }}">Crea el primero</a>.
+                                        @endif
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+
+                @if($clientes->hasPages())
+                    <div class="mt-3">
+                        {{ $clientes->links('pagination::bootstrap-5') }}
+                    </div>
+                @endif
             </div>
-        
-@endsection

@@ -155,6 +155,15 @@
 - La ruta resource de `cliente` esta registrada.
 - `view:cache` compila correctamente las vistas Blade de Clientes.
 
+### Filtro de clientes (pendiente de verificacion en navegador)
+
+- `cliente/index.blade.php`: se agrego un bloque de filtros con input de texto (DNI, nombre, direccion o telefono) y botones `Filtrar` / `Limpiar`, idéntico en estilo a los modulos de Coches, Oficinas y Alquileres.
+- Cada fila de la tabla ahora expone atributos `data-dni`, `data-nombre`, `data-direccion` y `data-telefono` para filtrado client-side mediante JavaScript inline en `@push('scripts')` (solo esta vista, no se toca `resources/js/app.js` ni otras tablas).
+- Se agrego la fila `<tr id="sinResultados" class="d-none">` que se muestra cuando no hay coincidencias.
+- El filtrado se ejecuta en el cliente sobre los datos ya renderizados (MySQL no interviene en la logica de filtro).
+- No se modificaron el controlador, el modelo, las rutas ni las migraciones de Clientes.
+- No se tocaron las tablas de Coches, Oficinas, Alquileres ni Usuarios.
+
 ## Autenticacion, roles y modulo Usuarios (2026-11-06)
 
 ### Completado

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,11 +14,27 @@ class ClienteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $datosClientes = Cliente::all();
+        $buscar = trim((string) $request->query('buscar', ''));
 
-        return view('cliente.index')->with('clientes', $datosClientes);
+        $clientes = Cliente::query()
+            ->when($buscar !== '', function (Builder $query) use ($buscar): void {
+                $query->where(function (Builder $query) use ($buscar): void {
+                    $query->where('DNI', 'like', "%{$buscar}%")
+                        ->orWhere('nombre', 'like', "%{$buscar}%")
+                        ->orWhere('direccion', 'like', "%{$buscar}%")
+                        ->orWhere('telefono', 'like', "%{$buscar}%");
+                });
+            })
+            ->orderBy('nombre')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('cliente.index', [
+            'clientes' => $clientes,
+            'filtros' => ['buscar' => $buscar],
+        ]);
     }
 
     /**
