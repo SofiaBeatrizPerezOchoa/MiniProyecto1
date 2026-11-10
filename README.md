@@ -64,10 +64,12 @@ php artisan serve
 
 ## Usuarios demo
 
-| Rol | Usuario | Contrasena |
-| --- | --- | --- |
-| Administrador | `admin` | `12345678` |
-| Empleado | `empleado` | `12345678` |
+| Tipo de usuario | Nombre completo | Usuario | Contrasena |
+| --- | --- | --- | --- |
+| Administrador | Prueba Administrador | `admin` | `12345678` |
+| Empleado | Prueba Empleado | `empleado` | `12345678` |
+
+Al crear un usuario, el nombre de usuario se genera automaticamente a partir del nombre completo: inicial del primer nombre mas el primer apellido (por ejemplo, `Zulmy Nicolle Bonilla Canales` genera `zbonilla`). Si ya existe, se usa el primer nombre mas la inicial del apellido y, si tambien existe, se agrega un numero. El campo sigue siendo editable.
 
 El administrador puede acceder a todos los modulos. El empleado solo puede acceder a clientes, coches y alquileres.
 

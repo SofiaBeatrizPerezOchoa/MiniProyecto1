@@ -37,8 +37,8 @@
 
                 <div class="col-12 col-md-6">
                     <label for="username" class="form-label">Usuario <span class="required-mark">*</span></label>
-                    <input type="text" id="username" name="username" value="{{ old('username') }}" class="form-control @error('username') is-invalid @enderror" maxlength="50" placeholder="Ingrese el nombre de usuario" autocomplete="off" required>
-                    <div class="form-text">Solo minúsculas, números, puntos, guiones y guiones bajos.</div>
+                    <input type="text" id="username" name="username" value="{{ old('username') }}" class="form-control @error('username') is-invalid @enderror" maxlength="50" placeholder="Se genera desde el nombre" autocomplete="off">
+                    <div class="form-text">Se genera automáticamente desde el nombre. Puede editarlo; debe ser único.</div>
                     @error('username')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -58,9 +58,9 @@
                 </div>
 
                 <div class="col-12 col-md-6">
-                    <label for="rol" class="form-label">Rol <span class="required-mark">*</span></label>
+                    <label for="rol" class="form-label">Tipo de usuario <span class="required-mark">*</span></label>
                     <select id="rol" name="rol" class="form-select @error('rol') is-invalid @enderror" required>
-                        <option value="">Seleccione un rol</option>
+                        <option value="">Seleccione un tipo de usuario</option>
                         @foreach($roles as $rol)
                             <option value="{{ $rol }}" @selected(old('rol') === $rol)>{{ ucfirst($rol) }}</option>
                         @endforeach
@@ -86,3 +86,81 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameInput = document.getElementById('name');
+            const usernameInput = document.getElementById('username');
+
+            if (!nameInput || !usernameInput) {
+                return;
+            }
+
+            const usernames = @json($usernames);
+            let usernameEdited = usernameInput.value.trim() !== '';
+
+            const palabras = (texto) => texto
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+            const limpiar = (texto) => texto.replace(/[^a-z0-9._-]/g, '').slice(0, 50);
+
+            const disponible = (base) => {
+                let candidato = limpiar(base) || 'usuario';
+                let sufijo = 2;
+
+                while (usernames.includes(candidato)) {
+                    const texto = String(sufijo++);
+                    candidato = `${candidato.slice(0, 50 - texto.length)}${texto}`;
+                }
+
+                return candidato;
+            };
+
+            const generar = (nombre) => {
+                const partes = palabras(nombre);
+
+                if (partes.length === 0) {
+                    return '';
+                }
+
+                const primerNombre = partes[0];
+
+                if (partes.length === 1) {
+                    return disponible(primerNombre);
+                }
+
+                const primerApellido = partes.length >= 3
+                    ? partes[partes.length - 2]
+                    : partes[partes.length - 1];
+
+                const base = limpiar(primerNombre.charAt(0) + primerApellido);
+
+                if (!usernames.includes(base)) {
+                    return base;
+                }
+
+                return disponible(primerNombre + primerApellido.charAt(0));
+            };
+
+            usernameInput.addEventListener('input', () => {
+                usernameEdited = true;
+            });
+
+            nameInput.addEventListener('input', () => {
+                if (!usernameEdited) {
+                    usernameInput.value = generar(nameInput.value);
+                }
+            });
+
+            if (!usernameEdited && nameInput.value.trim() !== '') {
+                usernameInput.value = generar(nameInput.value);
+            }
+        });
+    </script>
+@endpush

@@ -193,6 +193,19 @@
 - `composer db:setup` ejecutado correctamente en la base local; el seeder puede ejecutarse varias veces sin duplicar roles ni usuarios.
 - Seeder verificado con `admin` y `empleado`, ambos activos, con rol correcto y contrasena `12345678`.
 
+### Actualizacion del modulo Usuarios (2026-11-06)
+
+- Nombres demo visibles: `admin` es `Prueba Administrador` y `empleado` es `Prueba Empleado`; los usernames y contrasenas no cambiaron. El usuario local `zulmy` se renombro a `Zulmy Nicolle Bonilla Canales` conservando su username.
+- En la interfaz, la columna y campo `Rol` se muestran como `Tipo de usuario`; se sigue guardando en Spatie, sin columna nueva.
+- `usuario/index` ahora tiene busqueda por nombre/usuario/email y filtros por tipo y estado (`buscar`, `tipo`, `estado`), con estilos alineados a Oficinas y paginacion que conserva filtros.
+- Al crear un usuario con username vacio, el servidor lo genera desde el nombre completo:
+  - Base: inicial del primer nombre + primer apellido. Para 3+ palabras se usa la penultima; para 2 palabras, la ultima. Ejemplo: `Zulmy Nicolle Bonilla Canales` -> `zbonilla`.
+  - Si la base existe: primer nombre + inicial del apellido (`zulmyb`).
+  - Si tambien existe: se agrega un numero (`zulmyb2`, `zulmyb3`, ...).
+  - El campo es editable y el formulario de alta autogenera el username mientras no se edite manualmente.
+- Se agregaron pruebas de nombres demo, generacion de username, colisiones y filtros combinados.
+- Verificacion: 31 pruebas, 31 correctas, 128 aserciones; `pint --test`, `phpstan` y `view:cache` correctos. `composer db:setup` actualizo los nombres demo en la base local.
+
 ### Nota sobre pruebas y SQLite
 
 - PHP 8.4.25 tiene los DLL `php_pdo_sqlite.dll` y `php_sqlite3.dll`, pero no estan habilitados en `php.ini`.

@@ -141,6 +141,77 @@ class UsuarioManagementTest extends TestCase
         $this->assertTrue($this->admin->fresh()->hasRole('administrador'));
     }
 
+    public function test_username_is_generated_from_the_full_name_when_left_empty(): void
+    {
+        $response = $this->actingAs($this->admin)->post(route('usuario.store'), [
+            'name' => 'Zulmy Nicolle Bonilla Canales',
+            'username' => '',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+            'rol' => 'empleado',
+            'activo' => '1',
+        ]);
+
+        $response->assertRedirect(route('usuario.index'));
+        $this->assertDatabaseHas('users', [
+            'name' => 'Zulmy Nicolle Bonilla Canales',
+            'username' => 'zbonilla',
+        ]);
+    }
+
+    public function test_username_uses_name_and_surname_initial_when_the_base_exists(): void
+    {
+        $this->crearUsuario('zbonilla', 'password');
+
+        $this->actingAs($this->admin)->post(route('usuario.store'), [
+            'name' => 'Zulmy Nicolle Bonilla Canales',
+            'username' => '',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+            'rol' => 'empleado',
+            'activo' => '1',
+        ])->assertRedirect(route('usuario.index'));
+
+        $this->assertDatabaseHas('users', ['username' => 'zulmyb']);
+    }
+
+    public function test_username_appends_a_number_when_the_alternative_also_exists(): void
+    {
+        $this->crearUsuario('zbonilla', 'password');
+        $this->crearUsuario('zulmyb', 'password');
+
+        $this->actingAs($this->admin)->post(route('usuario.store'), [
+            'name' => 'Zulmy Nicolle Bonilla Canales',
+            'username' => '',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+            'rol' => 'empleado',
+            'activo' => '1',
+        ])->assertRedirect(route('usuario.index'));
+
+        $this->assertDatabaseHas('users', ['username' => 'zulmyb2']);
+    }
+
+    public function test_users_can_be_filtered_by_search_type_and_status(): void
+    {
+        $empleado = $this->crearUsuario('filtro.uno', 'password');
+        $empleado->update(['name' => 'Empleado Filtrado', 'activo' => false]);
+
+        $response = $this->actingAs($this->admin)->get(route('usuario.index', [
+            'buscar' => 'Filtrado',
+            'tipo' => 'empleado',
+            'estado' => '0',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Tipo de usuario');
+
+        $usuarios = $response->viewData('usuarios');
+
+        $this->assertCount(1, $usuarios);
+        $this->assertSame('Empleado Filtrado', $usuarios->first()->name);
+    }
+
     public function test_username_must_be_unique_but_can_remain_the_same_on_edit(): void
     {
         $this->crearUsuario('pedro', 'password');

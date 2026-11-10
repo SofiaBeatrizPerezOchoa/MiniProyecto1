@@ -20,6 +20,10 @@ class DemoUsersSeederTest extends TestCase
         $admin = User::where('username', 'admin')->firstOrFail();
         $empleado = User::where('username', 'empleado')->firstOrFail();
 
+        $this->assertSame('Prueba Administrador', $admin->name);
+        $this->assertSame('Prueba Empleado', $empleado->name);
+        $this->assertSame('admin', $admin->username);
+        $this->assertSame('empleado', $empleado->username);
         $this->assertTrue($admin->activo);
         $this->assertTrue($empleado->activo);
         $this->assertTrue(Hash::check('12345678', $admin->password));

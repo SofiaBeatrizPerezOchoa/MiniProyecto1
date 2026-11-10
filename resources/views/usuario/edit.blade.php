@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="col-12 col-md-6">
-                    <label for="rol" class="form-label">Rol <span class="required-mark">*</span></label>
+                    <label for="rol" class="form-label">Tipo de usuario <span class="required-mark">*</span></label>
                     <select id="rol" name="rol" class="form-select @error('rol') is-invalid @enderror" required>
                         @foreach($roles as $rol)
                             <option value="{{ $rol }}" @selected(old('rol', $rolActual) === $rol)>{{ ucfirst($rol) }}</option>

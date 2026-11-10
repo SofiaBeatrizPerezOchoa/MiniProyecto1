@@ -26,7 +26,7 @@ class RolesAndAdminUserSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['username' => 'admin'],
             [
-                'name' => 'Administrador',
+                'name' => 'Prueba Administrador',
                 'email' => null,
                 'password' => '12345678',
                 'activo' => true,
@@ -36,12 +36,20 @@ class RolesAndAdminUserSeeder extends Seeder
         $empleado = User::firstOrCreate(
             ['username' => 'empleado'],
             [
-                'name' => 'Empleado',
+                'name' => 'Prueba Empleado',
                 'email' => null,
                 'password' => '12345678',
                 'activo' => true,
             ],
         );
+
+        if ($admin->name !== 'Prueba Administrador') {
+            $admin->update(['name' => 'Prueba Administrador']);
+        }
+
+        if ($empleado->name !== 'Prueba Empleado') {
+            $empleado->update(['name' => 'Prueba Empleado']);
+        }
 
         if (! $admin->hasRole($administrador)) {
             $admin->assignRole($administrador);
