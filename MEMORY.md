@@ -8,6 +8,17 @@
 - Las migraciones ya estan ejecutadas en la base de datos local.
 - El comando `php` del sistema (8.3.33) no es compatible con las dependencias; usar `C:\laragon\bin\php\php-8.4.25-Win32-vs17-x64\php.exe`.
 
+## Migracion a vistas HTML independientes (2026-11-11)
+
+- Las 21 vistas con diseno de Clientes, Oficinas, Coches, Alquileres, Usuarios, dashboard y login ahora son documentos HTML completos (`<!DOCTYPE html>`, `<head>` y `<body>`).
+- Se eliminaron `@extends`, `@section('title')`, `@section('content')` y `@endsection` de esas vistas.
+- Cada vista de modulo incluye Bootstrap 5.3.3, Bootstrap Icons, el CSS del tema dentro de `<style>` y el sidebar completo duplicado.
+- `auth/login.blade.php` usa la estructura `guest-shell` / `guest-card` con su CSS.
+- Se conservan `@include('alquiler.partials.calculos')`, `@push('scripts')` y `@stack('scripts')` para los scripts de Alquileres y Usuarios.
+- Se eliminaron `layouts/app.blade.php`, `layouts/guest.blade.php` y `layouts/partials/theme.blade.php` porque ninguna vista los referencia.
+- Verificacion: `view:cache` correcto; las 17 rutas restantes (index, create, show, edit, dashboard y login) respondieron 200 en una prueba temporal con 17 aserciones; suite completa 31/33 con las mismas 2 fallas previas de `LoginTest` y `ClienteFilterTest`.
+- Tradeoff: el CSS y el sidebar estan duplicados en cada vista; cualquier cambio visual o de menu debe replicarse en todas.
+
 ## Modulo Coches
 
 ### Completado
@@ -41,7 +52,7 @@
 
 ### Decisiones
 
-- Interfaz visual con Bootstrap 5.3.3 por CDN; desde el 2026-11-06 las vistas de Coches usan el layout compartido `layouts.app`.
+- Interfaz visual con Bootstrap 5.3.3 por CDN; desde el 2026-11-11 las vistas de Coches son HTML completo independiente (sin `@extends`).
 - `codigo_oficina` sigue siendo texto libre; `grupo` y `estado` se seleccionan desde combobox en los formularios.
 - No se agregaron seeders ni datos de prueba.
 
@@ -146,7 +157,7 @@
 
 ### Decisiones
 
-- Interfaz visual con Bootstrap 5.3.3 por CDN; desde el 2026-11-06 las vistas de Clientes usan el layout compartido `layouts.app`.
+- Interfaz visual con Bootstrap 5.3.3 por CDN; desde el 2026-11-11 las vistas de Clientes son HTML completo independiente (sin `@extends`).
 - El segmento de ruta se resuelve por `DNI` (clave primaria), no por `id`.
 - No se agregaron seeders ni datos de prueba.
 
@@ -185,11 +196,9 @@
 - Se agrego el script `composer db:setup` (`migrate --force` + `db:seed --force`) para preparar una maquina con un solo comando.
 - `README.md` documenta instalacion, configuracion, credenciales demo y comando de pruebas.
 - No se exige verificacion de correo: se quitaron las referencias de `email_verified_at` en `User` y `UserFactory`; la columna sigue existiendo como nullable pero sin uso.
-- Layout compartido:
-  - `layouts/app.blade.php` con sidebar condicional por rol.
-  - `layouts/guest.blade.php` para login.
-  - `layouts/partials/theme.blade.php` con el CSS comun.
-  - Las 16 vistas de alquiler, coche, cliente y oficina se refactorizaron a `@extends('layouts.app')` conservando su contenido.
+- Layout compartido (eliminado):
+  - El 2026-11-11 todas las vistas con diseno pasaron a HTML completo independiente.
+  - Se eliminaron `layouts/app.blade.php`, `layouts/guest.blade.php` y `layouts/partials/theme.blade.php` al quedar sin referencias.
 - Mensajes en espanol en `lang/es/auth.php` y `lang/es/validation.php`; `APP_LOCALE=es`.
 - Rate limiter `login`: 5 intentos por minuto por username + IP.
 - Pruebas creadas en `tests/Feature/Auth/`, `tests/Feature/Usuario/UsuarioManagementTest.php` y `tests/Feature/Usuario/DemoUsersSeederTest.php`.
